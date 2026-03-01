@@ -15,12 +15,12 @@ const PARTY_COLOR = { GOP: "#e57373", DEM: "#64b5f6" };
 
 function getSopC(v){
   if(v>=13)return{bg:"#065f46",t:"#6ee7b7"};
-  if(v>=11)return{bg:"#064e3b",t:"#6ee7b7"};
-  if(v>=10)return{bg:"#1a3a2a",t:"#a7f3d0"};
-  if(v>=9)return{bg:"#1e293b",t:"#cbd5e1"};
-  if(v>=8)return{bg:"#1a1f2e",t:"#94a3b8"};
-  if(v>=7)return{bg:"#1a1520",t:"#94a3b8"};
-  if(v>=6)return{bg:"#1f1318",t:"#f9a8a8"};
+  if(v>=10)return{bg:"#064e3b",t:"#6ee7b7"};
+  if(v>=7)return{bg:"#1a3a2a",t:"#a7f3d0"};
+  if(v>=6)return{bg:"#1e293b",t:"#cbd5e1"};
+  if(v>=5)return{bg:"#1a1f2e",t:"#94a3b8"};
+  if(v>=4)return{bg:"#1a1520",t:"#94a3b8"};
+  if(v>=3)return{bg:"#1f1318",t:"#f9a8a8"};
   return{bg:"#2d1215",t:"#fca5a5"};
 }
 
