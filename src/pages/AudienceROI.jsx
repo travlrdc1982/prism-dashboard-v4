@@ -1,14 +1,35 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DATA from "../data/studyData";
+import { STUDY_METRICS, TIER_CONFIG, getTierNum } from "../data/study";
 
-// ─── STUDY DATA (from auto-generated file) ───
-const STUDY_DATA = {
-  ESI: { segments: DATA.ESI.segments, prePostMetrics: DATA.ESI.prePostMetrics },
-  MA:  { segments: DATA.MA.segments,  prePostMetrics: DATA.MA.prePostMetrics },
-};
+// ─── Build AL segment data by merging shared segments with study.js metrics ───
+const AL_SEGMENTS = DATA.segments.map(seg => {
+  const m = STUDY_METRICS[seg.code];
+  if (!m) return { ...seg, roi:0, highRoi:0, persuadability:[0,0,0,0,0], supporters:0, activation:0, influence:0, prePost:{} };
+  return {
+    ...seg,
+    roi: m.roi,
+    highRoi: m.highRoi,
+    supporters: m.supporters,
+    activation: m.activation,
+    influence: m.influence,
+    persuadability: m.persuadability,
+    prePost: m.prePost,
+  };
+});
 
-// ─── FIXED ROW HEIGHTS (ensures label column and data columns align) ───
+const AL_PRE_POST_METRICS = [
+  { key:"rank",  label:"Industry Rank", question:"On a scale from 1-100, how would you rank the pharmaceutical industry compared to other industries?", scale:"Mean score (0 = worst, 100 = best)" },
+  { key:"att1",  label:"Innovation Role", question:"How strongly do you agree that the U.S. pharmaceutical industry plays a critical role in global medical innovation?", scale:"% Agree" },
+  { key:"att2",  label:"Domestic Mfg", question:"How important is it that medicines are manufactured in the United States rather than overseas?", scale:"% Important" },
+  { key:"fav",   label:"Pharma Fav", question:"Overall, is your impression of the pharmaceutical industry favorable or unfavorable?", scale:"% Favorable" },
+];
+
+const SEGMENTS = AL_SEGMENTS;
+const PRE_POST_METRICS = AL_PRE_POST_METRICS;
+
+// ─── FIXED ROW HEIGHTS ───
 const H = {
   header: 120,
   roi: 54,
@@ -44,13 +65,6 @@ const C = {
   persuasion: "#5b93c7",
 };
 
-const ASSIGNED_TIERS = {
-  ESI: {TSP:3, CEC:1, TC:1, HF:1, PP:2, WE:1, PFF:2, HHN:1, MFL:3, VS:3,
-        UCP:3, FJP:1, HCP:3, HAD:1, HCI:1, GHI:2},
-  MA:  {TSP:3, CEC:1, TC:1, HF:3, PP:2, WE:2, PFF:3, HHN:2, MFL:3, VS:3,
-        UCP:1, FJP:1, HCP:1, HAD:3, HCI:1, GHI:1},
-};
-function getTier(code, study) { return (ASSIGNED_TIERS[study] || ASSIGNED_TIERS.ESI)[code] || 2; }
 function tierColor(t) { return t === 1 ? C.tier1 : t === 2 ? C.tier2 : C.tier3; }
 function tierBg(t) { return t === 1 ? C.tier1Bg : t === 2 ? C.tier2Bg : C.tier3Bg; }
 function tierLabel(t) { return t === 1 ? "TIER 1" : t === 2 ? "TIER 2" : "TIER 3"; }
@@ -165,8 +179,8 @@ function MetricLabel({ metric }) {
 }
 
 // ─── SEGMENT COLUMN ───
-function SegmentColumn({ seg, expanded, PRE_POST_METRICS, onNav, study }) {
-  const t = getTier(seg.code, study);
+function SegmentColumn({ seg, expanded, onNav }) {
+  const t = getTierNum(seg.roi);
   const tc = tierColor(t);
   const partyColor = seg.party === "GOP" ? C.gop : C.dem;
   const prePostH = H.prePostPad + PRE_POST_METRICS.length * H.prePostRow;
@@ -294,18 +308,16 @@ function SegmentColumn({ seg, expanded, PRE_POST_METRICS, onNav, study }) {
 export default function AudienceROI() {
   const navigate = useNavigate();
   const [expanded, setExpanded] = useState(false);
-  const [study, setStudy] = useState("ESI");
-  const { segments: SEGMENTS, prePostMetrics: PRE_POST_METRICS } = STUDY_DATA[study];
   const gopSegs = SEGMENTS.filter(s => s.party === "GOP");
   const demSegs = SEGMENTS.filter(s => s.party === "DEM");
   const prePostH = H.prePostPad + PRE_POST_METRICS.length * H.prePostRow;
 
   const persuadLabels = [
-    { label: "High leverage", color: C.persuasion },
-    { label: "Low leverage", color: C.accentLight },
-    { label: "Not convertible", color: "#4a5568" },
-    { label: "Not persuadable", color: "#2d3748" },
-    { label: "Neg. movement", color: "#1a202c" },
+    { label: "Strong support", color: C.persuasion },
+    { label: "Lean support", color: C.accentLight },
+    { label: "Persuadable", color: "#4a5568" },
+    { label: "Lean oppose", color: "#2d3748" },
+    { label: "Strong oppose", color: "#1a202c" },
   ];
 
   return (
@@ -318,17 +330,6 @@ export default function AudienceROI() {
           }}>Audience ROI</h1>
           <div style={{ fontSize: 9, color: C.text3, marginTop: 3, fontFamily: "'JetBrains Mono',monospace" }}>
             ROI = Population × (Persuasion + Coalition Value + Activation + Influence)
-          </div>
-          <div style={{ display: "flex", gap: 4, marginTop: 8 }}>
-            {[{k:"ESI",l:"ESI STUDY"},{k:"MA",l:"MA STUDY"}].map(s=>(
-              <button key={s.k} onClick={()=>setStudy(s.k)} style={{
-                fontFamily:"'JetBrains Mono',monospace",fontSize:9,letterSpacing:0.5,padding:"5px 14px",
-                border:"1px solid",borderRadius:4,cursor:"pointer",
-                borderColor:study===s.k?"#60a5fa":"#1c2433",
-                background:study===s.k?"#1e3a5f":"#111620",
-                color:study===s.k?"#93c5fd":"#7b8da3",transition:"all 0.15s"
-              }}>{s.l}</button>
-            ))}
           </div>
         </div>
 
@@ -469,7 +470,7 @@ export default function AudienceROI() {
             <div style={{ display: "flex", borderRight: `2px solid ${C.border}` }}>
               {gopSegs.map(s => (
                 <div key={s.code} style={{ borderRight: `1px solid ${C.border}` }}>
-                  <SegmentColumn seg={s} expanded={expanded} PRE_POST_METRICS={PRE_POST_METRICS} onNav={() => navigate('/profile?seg=' + s.code)} study={study} />
+                  <SegmentColumn seg={s} expanded={expanded} onNav={() => navigate('/profile?seg=' + s.code)} />
                 </div>
               ))}
             </div>
@@ -477,7 +478,7 @@ export default function AudienceROI() {
             <div style={{ display: "flex" }}>
               {demSegs.map(s => (
                 <div key={s.code} style={{ borderRight: `1px solid ${C.border}` }}>
-                  <SegmentColumn seg={s} expanded={expanded} PRE_POST_METRICS={PRE_POST_METRICS} onNav={() => navigate('/profile?seg=' + s.code)} study={study} />
+                  <SegmentColumn seg={s} expanded={expanded} onNav={() => navigate('/profile?seg=' + s.code)} />
                 </div>
               ))}
             </div>

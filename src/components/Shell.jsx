@@ -66,7 +66,7 @@ export default function Shell() {
           border: `1px solid ${C.cardBorder}`,
           flexShrink: 0,
         }}>
-          MA ESI STUDY
+          AMERICAN LEADERSHIP STUDY
         </div>
       </header>
 
