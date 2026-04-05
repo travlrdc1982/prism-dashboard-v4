@@ -209,56 +209,24 @@ const PREPOST = {
 
 // ─── VECTOR DATA ───
 // ─── STUDY-SPECIFIC ROI DATA ───
-// NOTE: tier is per-study. ESI tiers from Excel Row 3. MA tiers TBD (using ESI as placeholder).
+// American Leadership study metrics
 const STUDY_ROI = {
-  "TSP":{
-    ESI:{tier:3,roi:0.81,highRoi:25,supporters:73,activation:23,influence:5},
-    MA:{tier:3,roi:0.91,highRoi:34,supporters:51,activation:27,influence:5}},
-  "CEC":{
-    ESI:{tier:1,roi:1.01,highRoi:36,supporters:86,activation:36,influence:3},
-    MA:{tier:1,roi:1.24,highRoi:46,supporters:80,activation:27,influence:3}},
-  "TC":{
-    ESI:{tier:1,roi:1.11,highRoi:38,supporters:91,activation:43,influence:3},
-    MA:{tier:1,roi:0.81,highRoi:27,supporters:61,activation:15,influence:3}},
-  "WE":{
-    ESI:{tier:1,roi:1.10,highRoi:38,supporters:87,activation:34,influence:3},
-    MA:{tier:2,roi:0.94,highRoi:32,supporters:48,activation:17,influence:3}},
-  "PP":{
-    ESI:{tier:2,roi:1.02,highRoi:36,supporters:79,activation:33,influence:5},
-    MA:{tier:2,roi:1.03,highRoi:42,supporters:64,activation:27,influence:5}},
-  "HF":{
-    ESI:{tier:1,roi:1.22,highRoi:36,supporters:82,activation:27,influence:23},
-    MA:{tier:3,roi:0.88,highRoi:31,supporters:73,activation:30,influence:23}},
-  "PFF":{
-    ESI:{tier:2,roi:1.04,highRoi:34,supporters:84,activation:27,influence:12},
-    MA:{tier:3,roi:0.98,highRoi:34,supporters:51,activation:22,influence:12}},
-  "HHN":{
-    ESI:{tier:1,roi:1.04,highRoi:37,supporters:75,activation:25,influence:20},
-    MA:{tier:2,roi:1.05,highRoi:43,supporters:69,activation:35,influence:20}},
-  "MFL":{
-    ESI:{tier:3,roi:0.81,highRoi:31,supporters:82,activation:28,influence:5},
-    MA:{tier:3,roi:0.99,highRoi:38,supporters:74,activation:34,influence:5}},
-  "VS":{
-    ESI:{tier:3,roi:0.84,highRoi:26,supporters:74,activation:23,influence:4},
-    MA:{tier:3,roi:0.84,highRoi:29,supporters:52,activation:22,influence:4}},
-  "UCP":{
-    ESI:{tier:3,roi:0.89,highRoi:37,supporters:68,activation:32,influence:5},
-    MA:{tier:1,roi:1.19,highRoi:49,supporters:79,activation:35,influence:5}},
-  "FJP":{
-    ESI:{tier:1,roi:1.01,highRoi:42,supporters:75,activation:33,influence:5},
-    MA:{tier:1,roi:1.04,highRoi:43,supporters:69,activation:35,influence:5}},
-  "HCP":{
-    ESI:{tier:3,roi:0.85,highRoi:33,supporters:77,activation:22,influence:4},
-    MA:{tier:1,roi:1.25,highRoi:50,supporters:73,activation:45,influence:4}},
-  "HAD":{
-    ESI:{tier:1,roi:1.10,highRoi:40,supporters:81,activation:33,influence:10},
-    MA:{tier:3,roi:0.86,highRoi:37,supporters:61,activation:27,influence:10}},
-  "HCI":{
-    ESI:{tier:1,roi:1.17,highRoi:45,supporters:87,activation:29,influence:4},
-    MA:{tier:1,roi:0.91,highRoi:30,supporters:61,activation:25,influence:4}},
-  "GHI":{
-    ESI:{tier:2,roi:0.98,highRoi:36,supporters:85,activation:35,influence:7},
-    MA:{tier:1,roi:1.06,highRoi:43,supporters:72,activation:32,influence:7}},
+  "TSP":{ AL:{tier:2,roi:0.90,highRoi:20,supporters:62,activation:23,influence:23} },
+  "CEC":{ AL:{tier:1,roi:1.07,highRoi:28,supporters:60,activation:12,influence:7} },
+  "TC":{  AL:{tier:2,roi:1.13,highRoi:35,supporters:70,activation:26,influence:18} },
+  "HF":{  AL:{tier:3,roi:0.88,highRoi:17,supporters:56,activation:19,influence:29} },
+  "PP":{  AL:{tier:2,roi:1.02,highRoi:27,supporters:45,activation:7,influence:5} },
+  "WE":{  AL:{tier:3,roi:1.08,highRoi:24,supporters:51,activation:13,influence:11} },
+  "PFF":{ AL:{tier:3,roi:0.95,highRoi:20,supporters:33,activation:14,influence:17} },
+  "HHN":{ AL:{tier:3,roi:1.05,highRoi:25,supporters:63,activation:29,influence:24} },
+  "MFL":{ AL:{tier:1,roi:1.07,highRoi:26,supporters:53,activation:8,influence:11} },
+  "VS":{  AL:{tier:3,roi:0.75,highRoi:13,supporters:31,activation:14,influence:14} },
+  "UCP":{ AL:{tier:2,roi:0.98,highRoi:23,supporters:47,activation:9,influence:10} },
+  "FJP":{ AL:{tier:2,roi:1.05,highRoi:24,supporters:59,activation:8,influence:6} },
+  "HCP":{ AL:{tier:2,roi:1.00,highRoi:27,supporters:53,activation:8,influence:6} },
+  "GHI":{ AL:{tier:1,roi:1.09,highRoi:31,supporters:59,activation:6,influence:10} },
+  "HAD":{ AL:{tier:3,roi:1.01,highRoi:24,supporters:60,activation:18,influence:9} },
+  "HCI":{ AL:{tier:2,roi:0.95,highRoi:23,supporters:60,activation:7,influence:15} },
 };
 
 const GOP_VECTORS = {
@@ -2082,17 +2050,17 @@ export default function SegmentProfile() {
             </div>
           </div>
 
-          {/* ROI Cards — one per study, stacked */}
+          {/* ROI Card — AL Study */}
           <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-            {STUDY_ROI[seg.code] && ["ESI","MA"].map(study => {
-              const d = STUDY_ROI[seg.code][study];
+            {STUDY_ROI[seg.code] && (() => {
+              const d = STUDY_ROI[seg.code].AL;
               if (!d) return null;
               const studyTier = d.tier || seg.tier;
               const studyTc = TIER_ACCENT[studyTier];
               return (
-                <div key={study} style={{ background:"#111827", borderRadius:8, padding:"8px 10px", border:"1px solid #1e293b" }}>
+                <div style={{ background:"#111827", borderRadius:8, padding:"8px 10px", border:"1px solid #1e293b" }}>
                   <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:4 }}>
-                    <div style={{ fontSize:7, fontWeight:700, color:"#94a3b8", fontFamily:"'Roboto Slab',serif", textTransform:"uppercase", letterSpacing:1.5 }}>{study === "ESI" ? "ESI STUDY" : "MA STUDY"} ROI</div>
+                    <div style={{ fontSize:7, fontWeight:700, color:"#94a3b8", fontFamily:"'Roboto Slab',serif", textTransform:"uppercase", letterSpacing:1.5 }}>AL STUDY ROI</div>
                     <span style={{ fontSize:7, fontWeight:700, padding:"1px 6px", borderRadius:3, background:TIER_BG[studyTier], color:TIER_TEXT[studyTier], fontFamily:"'Nunito',sans-serif", letterSpacing:1 }}>{TIER_LABELS[studyTier]}</span>
                   </div>
                   <div style={{ textAlign:"center", padding:"4px 0", borderBottom:"1px solid #1e293b", marginBottom:5 }}>
@@ -2118,7 +2086,7 @@ export default function SegmentProfile() {
                   </div>
                 </div>
               );
-            })}
+            })()}
           </div>
         </div>
 
