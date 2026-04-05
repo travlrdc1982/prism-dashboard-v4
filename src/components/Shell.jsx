@@ -1,4 +1,5 @@
 import { NavLink, Outlet } from "react-router-dom";
+import { supabase } from "../supabaseClient";
 import { C, FONT } from "../data/theme";
 
 const NAV_ITEMS = [
@@ -58,15 +59,25 @@ export default function Shell() {
           ))}
         </nav>
 
-        {/* Study badge */}
-        <div style={{
-          fontSize: 9, fontWeight: 600, color: C.textDim,
-          letterSpacing: 1, textTransform: "uppercase",
-          padding: "4px 10px", borderRadius: 4,
-          border: `1px solid ${C.cardBorder}`,
-          flexShrink: 0,
-        }}>
-          AMERICAN LEADERSHIP STUDY
+        {/* Study badge + Sign out */}
+        <div style={{ display:"flex", alignItems:"center", gap:8, flexShrink:0 }}>
+          <div style={{
+            fontSize: 9, fontWeight: 600, color: C.textDim,
+            letterSpacing: 1, textTransform: "uppercase",
+            padding: "4px 10px", borderRadius: 4,
+            border: `1px solid ${C.cardBorder}`,
+          }}>
+            AMERICAN LEADERSHIP STUDY
+          </div>
+          <button
+            onClick={() => supabase.auth.signOut()}
+            style={{
+              fontSize: 9, fontWeight: 500, color: C.textDim,
+              background: "none", border: `1px solid ${C.cardBorder}`,
+              borderRadius: 4, padding: "4px 10px", cursor: "pointer",
+              fontFamily: "'Nunito',sans-serif", transition: "all 0.15s",
+            }}
+          >SIGN OUT</button>
         </div>
       </header>
 

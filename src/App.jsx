@@ -1,11 +1,30 @@
+import { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { supabase } from "./supabaseClient";
 import Shell from "./components/Shell";
 import SegmentMap from "./pages/SegmentMap";
 import AudienceROI from "./pages/AudienceROI";
 import MessageMap from "./pages/MessageMap";
 import SegmentProfile from "./pages/SegmentProfile";
+import Login from "./pages/Login";
 
 export default function App() {
+  const [session, setSession] = useState(undefined); // undefined = loading
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => setSession(session));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => setSession(session));
+    return () => subscription.unsubscribe();
+  }, []);
+
+  if (session === undefined) {
+    return <div style={{ minHeight:"100vh", background:"#080c16", display:"flex", alignItems:"center", justifyContent:"center", color:"#64748b", fontFamily:"'Nunito',sans-serif", fontSize:12 }}>Loading...</div>;
+  }
+
+  if (!session) {
+    return <Login onAuth={() => {}} />;
+  }
+
   return (
     <BrowserRouter>
       <Routes>
