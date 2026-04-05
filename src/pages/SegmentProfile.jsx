@@ -209,24 +209,25 @@ const PREPOST = {
 
 // ─── VECTOR DATA ───
 // ─── STUDY-SPECIFIC ROI DATA ───
-// American Leadership study metrics
+// American Leadership study metrics. Tier computed dynamically from ROI.
+function alTier(roi) { return roi >= 1.07 ? 1 : roi >= 1.00 ? 2 : 3; }
 const STUDY_ROI = {
-  "TSP":{ AL:{tier:2,roi:0.90,highRoi:20,supporters:62,activation:23,influence:23} },
-  "CEC":{ AL:{tier:1,roi:1.07,highRoi:28,supporters:60,activation:12,influence:7} },
-  "TC":{  AL:{tier:2,roi:1.13,highRoi:35,supporters:70,activation:26,influence:18} },
-  "HF":{  AL:{tier:3,roi:0.88,highRoi:17,supporters:56,activation:19,influence:29} },
-  "PP":{  AL:{tier:2,roi:1.02,highRoi:27,supporters:45,activation:7,influence:5} },
-  "WE":{  AL:{tier:3,roi:1.08,highRoi:24,supporters:51,activation:13,influence:11} },
-  "PFF":{ AL:{tier:3,roi:0.95,highRoi:20,supporters:33,activation:14,influence:17} },
-  "HHN":{ AL:{tier:3,roi:1.05,highRoi:25,supporters:63,activation:29,influence:24} },
-  "MFL":{ AL:{tier:1,roi:1.07,highRoi:26,supporters:53,activation:8,influence:11} },
-  "VS":{  AL:{tier:3,roi:0.75,highRoi:13,supporters:31,activation:14,influence:14} },
-  "UCP":{ AL:{tier:2,roi:0.98,highRoi:23,supporters:47,activation:9,influence:10} },
-  "FJP":{ AL:{tier:2,roi:1.05,highRoi:24,supporters:59,activation:8,influence:6} },
-  "HCP":{ AL:{tier:2,roi:1.00,highRoi:27,supporters:53,activation:8,influence:6} },
-  "GHI":{ AL:{tier:1,roi:1.09,highRoi:31,supporters:59,activation:6,influence:10} },
-  "HAD":{ AL:{tier:3,roi:1.01,highRoi:24,supporters:60,activation:18,influence:9} },
-  "HCI":{ AL:{tier:2,roi:0.95,highRoi:23,supporters:60,activation:7,influence:15} },
+  "TSP":{ AL:{roi:0.90,highRoi:20,supporters:62,activation:23,influence:23} },
+  "CEC":{ AL:{roi:1.07,highRoi:28,supporters:60,activation:12,influence:7} },
+  "TC":{  AL:{roi:1.13,highRoi:35,supporters:70,activation:26,influence:18} },
+  "HF":{  AL:{roi:0.88,highRoi:17,supporters:56,activation:19,influence:29} },
+  "PP":{  AL:{roi:1.02,highRoi:27,supporters:45,activation:7,influence:5} },
+  "WE":{  AL:{roi:1.08,highRoi:24,supporters:51,activation:13,influence:11} },
+  "PFF":{ AL:{roi:0.95,highRoi:20,supporters:33,activation:14,influence:17} },
+  "HHN":{ AL:{roi:1.05,highRoi:25,supporters:63,activation:29,influence:24} },
+  "MFL":{ AL:{roi:1.07,highRoi:26,supporters:53,activation:8,influence:11} },
+  "VS":{  AL:{roi:0.75,highRoi:13,supporters:31,activation:14,influence:14} },
+  "UCP":{ AL:{roi:0.98,highRoi:23,supporters:47,activation:9,influence:10} },
+  "FJP":{ AL:{roi:1.05,highRoi:24,supporters:59,activation:8,influence:6} },
+  "HCP":{ AL:{roi:1.00,highRoi:27,supporters:53,activation:8,influence:6} },
+  "GHI":{ AL:{roi:1.09,highRoi:31,supporters:59,activation:6,influence:10} },
+  "HAD":{ AL:{roi:1.01,highRoi:24,supporters:60,activation:18,influence:9} },
+  "HCI":{ AL:{roi:0.95,highRoi:23,supporters:60,activation:7,influence:15} },
 };
 
 const GOP_VECTORS = {
@@ -2055,7 +2056,7 @@ export default function SegmentProfile() {
             {STUDY_ROI[seg.code] && (() => {
               const d = STUDY_ROI[seg.code].AL;
               if (!d) return null;
-              const studyTier = d.tier || seg.tier;
+              const studyTier = alTier(d.roi);
               const studyTc = TIER_ACCENT[studyTier];
               return (
                 <div style={{ background:"#111827", borderRadius:8, padding:"8px 10px", border:"1px solid #1e293b" }}>
