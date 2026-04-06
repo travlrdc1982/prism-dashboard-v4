@@ -4,26 +4,17 @@ import { supabase } from "../supabaseClient";
 export default function Login({ onAuth }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isSignUp, setIsSignUp] = useState(false);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState(null);
 
   async function handleSubmit(e) {
     e.preventDefault();
     setError(null);
-    setMessage(null);
     setLoading(true);
 
-    if (isSignUp) {
-      const { error } = await supabase.auth.signUp({ email, password });
-      if (error) setError(error.message);
-      else setMessage("Check your email to confirm your account.");
-    } else {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) setError(error.message);
-      else onAuth();
-    }
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) setError(error.message);
+    else onAuth();
     setLoading(false);
   }
 
@@ -33,6 +24,10 @@ export default function Login({ onAuth }) {
       display: "flex", alignItems: "center", justifyContent: "center",
       fontFamily: "'Nunito', sans-serif"
     }}>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+      />
       <div style={{
         width: 360, background: "#0f1520", borderRadius: 12,
         border: "1px solid #1e293b", padding: "32px 28px"
@@ -74,18 +69,13 @@ export default function Login({ onAuth }) {
                 fontSize: 13, fontFamily: "'Nunito', sans-serif", outline: "none",
                 boxSizing: "border-box"
               }}
-              placeholder={isSignUp ? "Create a password (6+ chars)" : "Enter password"}
+              placeholder="Enter password"
             />
           </div>
 
           {error && (
             <div style={{ fontSize: 11, color: "#ef4444", marginBottom: 12, padding: "6px 10px", background: "#1f1318", borderRadius: 4 }}>
               {error}
-            </div>
-          )}
-          {message && (
-            <div style={{ fontSize: 11, color: "#34d399", marginBottom: 12, padding: "6px 10px", background: "#062e1e", borderRadius: 4 }}>
-              {message}
             </div>
           )}
 
@@ -99,20 +89,12 @@ export default function Login({ onAuth }) {
               transition: "background 0.15s"
             }}
           >
-            {loading ? "..." : isSignUp ? "CREATE ACCOUNT" : "SIGN IN"}
+            {loading ? "..." : "SIGN IN"}
           </button>
         </form>
 
-        <div style={{ textAlign: "center", marginTop: 16 }}>
-          <button
-            onClick={() => { setIsSignUp(!isSignUp); setError(null); setMessage(null); }}
-            style={{
-              background: "none", border: "none", color: "#64748b",
-              fontSize: 11, cursor: "pointer", fontFamily: "'Nunito', sans-serif"
-            }}
-          >
-            {isSignUp ? "Already have an account? Sign in" : "Need an account? Create one"}
-          </button>
+        <div style={{ textAlign: "center", marginTop: 16, fontSize: 9, color: "#475569" }}>
+          Contact your administrator for access
         </div>
       </div>
     </div>
