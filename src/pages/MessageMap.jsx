@@ -36,15 +36,27 @@ const THEME_COLORS = {
 // ─── Party colors ───
 const PARTY_COLOR = { GOP: "#e57373", DEM: "#64b5f6" };
 
-function getSopC(v) {
-  if (v >= 13) return { bg:"#065f46", t:"#6ee7b7" };
-  if (v >= 11) return { bg:"#064e3b", t:"#6ee7b7" };
-  if (v >= 10) return { bg:"#1a3a2a", t:"#a7f3d0" };
-  if (v >= 9)  return { bg:"#1e293b", t:"#cbd5e1" };
-  if (v >= 8)  return { bg:"#1a1f2e", t:"#94a3b8" };
-  if (v >= 7)  return { bg:"#1a1520", t:"#94a3b8" };
-  if (v >= 6)  return { bg:"#1f1318", t:"#f9a8a8" };
-  return { bg:"#2d1215", t:"#fca5a5" };
+const SOP_COLORS = [
+  { bg:"#2d1215", t:"#fca5a5" },  // p0-10  — deep red
+  { bg:"#1f1318", t:"#f9a8a8" },  // p10-25 — red
+  { bg:"#1a1520", t:"#94a3b8" },  // p25-40 — muted dark
+  { bg:"#1e293b", t:"#cbd5e1" },  // p40-60 — neutral (median band)
+  { bg:"#1a3a2a", t:"#a7f3d0" },  // p60-75 — light green
+  { bg:"#064e3b", t:"#6ee7b7" },  // p75-90 — green
+  { bg:"#065f46", t:"#6ee7b7" },  // p90+   — deep green
+];
+const PERCENTILE_BREAKS = [0.10, 0.25, 0.40, 0.60, 0.75, 0.90];
+
+function buildColorScale(sopMatrix) {
+  const all = sopMatrix.flat().filter(v => v != null).sort((a, b) => a - b);
+  if (!all.length) return () => SOP_COLORS[3];
+  const breakpoints = PERCENTILE_BREAKS.map(p => all[Math.floor(p * (all.length - 1))]);
+  return (v) => {
+    for (let i = 0; i < breakpoints.length; i++) {
+      if (v < breakpoints[i]) return SOP_COLORS[i];
+    }
+    return SOP_COLORS[SOP_COLORS.length - 1];
+  };
 }
 
 // Variant keys in study.js use spreadsheet column numbers, not segment IDs.
@@ -89,6 +101,7 @@ export default function MessageMap() {
   const sopMatrix = isTotal ? TOTAL_SOP : isVariant ? VARIANT_SOP : CONTROL_SOP;
   const totalsArray = isTotal ? TOTAL_TOTALS : isVariant ? VARIANT_TOTALS : CONTROL_TOTALS;
   const MESSAGES = buildAlMessages(sopMatrix, totalsArray, isVariant);
+  const getSopC = useMemo(() => buildColorScale(sopMatrix), [sopMatrix]);
 
   const sorted = useMemo(() => {
     const ix = MESSAGES.map((m, i) => ({ ...m, idx: i }));
@@ -142,8 +155,8 @@ export default function MessageMap() {
 
       {/* Legend */}
       <div style={{ display:"flex", gap:12, alignItems:"center", marginBottom:6, flexWrap:"wrap" }}>
-        <span style={{ fontFamily:"'JetBrains Mono',monospace", fontSize:7, color:"#475569", letterSpacing:1 }}>SoP:</span>
-        {[{ l:"≤6", bg:"#2d1215" }, { l:"7-8", bg:"#1a1520" }, { l:"9-10", bg:"#1e293b" }, { l:"11-12", bg:"#064e3b" }, { l:"≥13", bg:"#065f46" }].map((h, i) => (
+        <span style={{ fontFamily:"'JetBrains Mono',monospace", fontSize:7, color:"#475569", letterSpacing:1 }}>SoP PERCENTILE:</span>
+        {[{ l:"Bottom 10%", bg:"#2d1215" }, { l:"10-25%", bg:"#1f1318" }, { l:"25-40%", bg:"#1a1520" }, { l:"40-60%", bg:"#1e293b" }, { l:"60-75%", bg:"#1a3a2a" }, { l:"75-90%", bg:"#064e3b" }, { l:"Top 10%", bg:"#065f46" }].map((h, i) => (
           <div key={i} style={{ display:"flex", alignItems:"center", gap:2 }}>
             <div style={{ width:10, height:10, borderRadius:2, background:h.bg, border:"1px solid #1e293b" }} />
             <span style={{ fontSize:7, color:"#94a3b8" }}>{h.l}</span>
