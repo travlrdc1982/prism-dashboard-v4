@@ -52,6 +52,10 @@ export const MESSAGES = [
 
 // ─── SoP MATRICES (11 messages × 16 segments) ───
 // Segment order: TSP,CEC,TC,HF,PP,WE,PFF,HHN,MFL,VS,UCP,FJP,HCP,HAD,HCI,GHI
+// Actual Total values from spreadsheet (not computed)
+export const TOTAL_TOTALS = [7.6,10.1,6.7,7.8,10.6,12.6,8.4,11.8,6.7,10.4,7.5];
+export const CONTROL_TOTALS = [6.3,11.2,5.9,8.9,10.6,13.2,9.0,11.7,6.8,9.4,7.2];
+export const VARIANT_TOTALS = [8.8,9.0,7.4,6.7,10.6,11.9,7.9,12.0,6.7,11.4,7.7];
 export const TOTAL_SOP = [
   [8.8,10.3,7.3,5.9,7.7,8.9,10.5,9.9,9.4,7.9,6.5,7.1,6.9,6.6,7.6,4.8],
   [9.2,12.8,14.1,11.0,9.9,17.1,12.3,7.6,8.2,16.7,7.1,5.6,8.1,9.8,8.5,7.8],

@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
 import DATA from "../data/studyData";
-import { MESSAGES as AL_MESSAGES, CONTROL_SOP, VARIANT_SOP, TOTAL_SOP } from "../data/study";
+import { MESSAGES as AL_MESSAGES, CONTROL_SOP, VARIANT_SOP, TOTAL_SOP, TOTAL_TOTALS, CONTROL_TOTALS, VARIANT_TOTALS } from "../data/study";
 
 // ─── SEGMENTS from shared data ───
 const SEGMENTS = DATA.segments;
@@ -9,10 +9,9 @@ const SEGMENTS = DATA.segments;
 const SEG_POPS = SEGMENTS.map(s => s.pop);
 const POP_TOTAL = SEG_POPS.reduce((a, b) => a + b, 0);
 
-function buildAlMessages(sopMatrix, useVariants) {
+function buildAlMessages(sopMatrix, totalsArray, useVariants) {
   return AL_MESSAGES.map((m, i) => {
     const segSops = sopMatrix[i];
-    const wtTotal = segSops.reduce((sum, v, si) => sum + v * (SEG_POPS[si] / POP_TOTAL), 0);
     const text = useVariants
       ? (Object.values(m.variants || {})[0] || m.control)
       : m.control;
@@ -21,7 +20,7 @@ function buildAlMessages(sopMatrix, useVariants) {
       shortName: m.shortName,
       text,
       theme: m.theme,
-      sop: [Math.round(wtTotal * 10) / 10, ...segSops],
+      sop: [totalsArray[i], ...segSops],
       variants: m.variants,
       control: m.control,
     };
@@ -88,7 +87,8 @@ export default function MessageMap() {
   const isVariant = variantMode === "persona";
   const isTotal = variantMode === "total";
   const sopMatrix = isTotal ? TOTAL_SOP : isVariant ? VARIANT_SOP : CONTROL_SOP;
-  const MESSAGES = buildAlMessages(sopMatrix, isVariant);
+  const totalsArray = isTotal ? TOTAL_TOTALS : isVariant ? VARIANT_TOTALS : CONTROL_TOTALS;
+  const MESSAGES = buildAlMessages(sopMatrix, totalsArray, isVariant);
 
   const sorted = useMemo(() => {
     const ix = MESSAGES.map((m, i) => ({ ...m, idx: i }));
