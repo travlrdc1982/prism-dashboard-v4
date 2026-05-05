@@ -127,16 +127,7 @@ export const TIER_CONFIG = {
 
 export function getTierNum(roi) { return roi >= 1.07 ? 1 : roi >= 1.00 ? 2 : 3; }
 
-export function getSopColor(v) {
-  if (v >= 13) return { bg:"#065f46", t:"#6ee7b7" };
-  if (v >= 11) return { bg:"#064e3b", t:"#6ee7b7" };
-  if (v >= 10) return { bg:"#1a3a2a", t:"#a7f3d0" };
-  if (v >= 9)  return { bg:"#1e293b", t:"#cbd5e1" };
-  if (v >= 8)  return { bg:"#1a1f2e", t:"#94a3b8" };
-  if (v >= 7)  return { bg:"#1a1520", t:"#94a3b8" };
-  if (v >= 6)  return { bg:"#1f1318", t:"#f9a8a8" };
-  return { bg:"#2d1215", t:"#fca5a5" };
-}
+// SoP colors are now computed dynamically by percentile in MessageMap.jsx
 
 // ─── PERSUADABILITY LABELS ───
 export const PERSUADABILITY_LABELS = ["Strong support","Lean support","Persuadable","Lean oppose","Strong oppose"];
