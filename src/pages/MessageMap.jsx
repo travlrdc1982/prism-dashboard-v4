@@ -48,13 +48,18 @@ function getSopC(v) {
   return { bg:"#2d1215", t:"#fca5a5" };
 }
 
+// Variant keys in study.js use spreadsheet column numbers, not segment IDs.
+// This maps segment ID → variant key for the mismatched segments.
+const SEG_TO_VARIANT = { 1:10, 2:1, 4:7, 7:4, 8:2, 10:8 };
+
 function Tooltip({ msg, x, y, segIdx, isVariant }) {
   let displayText = msg.text;
   let variantLabel = null;
   if (isVariant && segIdx != null && msg.variants) {
     const segId = SEGMENTS[segIdx]?.id;
-    if (segId && msg.variants[segId]) {
-      displayText = msg.variants[segId];
+    const variantKey = SEG_TO_VARIANT[segId] || segId;
+    if (variantKey && msg.variants[variantKey]) {
+      displayText = msg.variants[variantKey];
       variantLabel = `Segment ${SEGMENTS[segIdx].code} variant`;
     } else {
       displayText = msg.control || msg.text;
