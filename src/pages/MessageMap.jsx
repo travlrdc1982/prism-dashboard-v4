@@ -1,6 +1,6 @@
-import { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import DATA from "../data/studyData";
-import { MESSAGES as AL_MESSAGES, CONTROL_SOP, VARIANT_SOP } from "../data/study";
+import { MESSAGES as AL_MESSAGES, CONTROL_SOP, VARIANT_SOP, TOTAL_SOP } from "../data/study";
 
 // ─── SEGMENTS from shared data ───
 const SEGMENTS = DATA.segments;
@@ -80,12 +80,15 @@ function Tooltip({ msg, x, y, segIdx, isVariant }) {
 export default function MessageMap() {
   const [sortCol, setSortCol] = useState(null);
   const [tooltip, setTooltip] = useState(null);
-  const [variantMode, setVariantMode] = useState("control");
+  const [variantMode, setVariantMode] = useState("total");
   const [hoverRow, setHoverRow] = useState(null);
   const [hoverCol, setHoverCol] = useState(null);
+  const [expandedRows, setExpandedRows] = useState({});
 
   const isVariant = variantMode === "persona";
-  const MESSAGES = buildAlMessages(isVariant ? VARIANT_SOP : CONTROL_SOP, isVariant);
+  const isTotal = variantMode === "total";
+  const sopMatrix = isTotal ? TOTAL_SOP : isVariant ? VARIANT_SOP : CONTROL_SOP;
+  const MESSAGES = buildAlMessages(sopMatrix, isVariant);
 
   const sorted = useMemo(() => {
     const ix = MESSAGES.map((m, i) => ({ ...m, idx: i }));
@@ -108,21 +111,31 @@ export default function MessageMap() {
         </div>
       </div>
 
-      {/* Persona variant toggle */}
+      {/* Mode toggle */}
       <div style={{ display:"flex", gap:4, marginBottom:10, alignItems:"center" }}>
-        {[{ k:"control", l:"CONTROL" }, { k:"persona", l:"PERSONA VARIANTS" }].map(v => (
-          <button key={v.k} onClick={() => { setVariantMode(v.k); setSortCol(null); }} style={{
-            fontFamily:"'JetBrains Mono',monospace", fontSize:9, letterSpacing:0.5,
-            padding:"5px 14px", border:"1px solid", borderRadius:4, cursor:"pointer",
-            borderColor: variantMode === v.k ? "#a78bfa" : "#1e293b",
-            background: variantMode === v.k ? "#2d1b69" : "#111827",
-            color: variantMode === v.k ? "#c4b5fd" : "#64748b",
-            transition:"all 0.15s"
-          }}>{v.l}</button>
-        ))}
+        {[{ k:"total", l:"TOTAL" }, { k:"control", l:"CONTROL" }, { k:"persona", l:"PERSONA VARIANTS" }].map(v => {
+          const active = variantMode === v.k;
+          const accent = v.k === "total" ? { border:"#34d399", bg:"#064e3b", text:"#6ee7b7" }
+            : { border:"#a78bfa", bg:"#2d1b69", text:"#c4b5fd" };
+          return (
+            <button key={v.k} onClick={() => { setVariantMode(v.k); setSortCol(null); setExpandedRows({}); }} style={{
+              fontFamily:"'JetBrains Mono',monospace", fontSize:9, letterSpacing:0.5,
+              padding:"5px 14px", border:"1px solid", borderRadius:4, cursor:"pointer",
+              borderColor: active ? accent.border : "#1e293b",
+              background: active ? accent.bg : "#111827",
+              color: active ? accent.text : "#64748b",
+              transition:"all 0.15s"
+            }}>{v.l}</button>
+          );
+        })}
         {isVariant && (
           <span style={{ fontSize:8, color:"#a78bfa", fontFamily:"'JetBrains Mono',monospace", marginLeft:8 }}>
             Hover a segment column to see its tailored variant text
+          </span>
+        )}
+        {isTotal && (
+          <span style={{ fontSize:8, color:"#34d399", fontFamily:"'JetBrains Mono',monospace", marginLeft:8 }}>
+            Click a row to expand the full message text
           </span>
         )}
       </div>
@@ -243,26 +256,35 @@ export default function MessageMap() {
               const sop = MESSAGES[msg.idx].sop;
               const rowActive = isRowActive(msg.id);
               const rowBrightness = rowActive ? "brightness(1.18)" : "brightness(1)";
+              const isExpanded = !!expandedRows[msg.id];
+
+              const toggleExpand = () => setExpandedRows(prev => ({ ...prev, [msg.id]: !prev[msg.id] }));
 
               return (
+              <React.Fragment key={msg.id}>
               <tr
-                key={msg.id}
                 onMouseEnter={() => setHoverRow(msg.id)}
                 onMouseLeave={() => setHoverRow(null)}
                 style={{ filter:rowBrightness, transition:"filter 0.1s" }}
               >
                 {/* Row # */}
-                <td style={{ background:"#111827", textAlign:"center", fontFamily:"'JetBrains Mono',monospace", fontSize:7, color:"#64748b", fontWeight:700, padding:2 }}>{msg.id}</td>
+                <td style={{ background:"#111827", textAlign:"center", fontFamily:"'JetBrains Mono',monospace", fontSize:7, color:"#64748b", fontWeight:700, padding:2 }}>
+                  {isTotal ? (
+                    <span onClick={toggleExpand} style={{ cursor:"pointer", display:"inline-block", transition:"transform 0.2s", transform:isExpanded?"rotate(90deg)":"rotate(0deg)", fontSize:9, color:"#34d399" }}>▸</span>
+                  ) : msg.id}
+                </td>
 
-                {/* Message name — TOOLTIP */}
+                {/* Message name */}
                 <td
-                  onMouseEnter={e => setTooltip({ msg, x:e.clientX, y:e.clientY, segIdx:null })}
-                  onMouseMove={e => setTooltip(t2 => t2 ? { ...t2, x:e.clientX, y:e.clientY } : null)}
-                  onMouseLeave={() => setTooltip(null)}
+                  onClick={isTotal ? toggleExpand : undefined}
+                  onMouseEnter={!isTotal ? (e => setTooltip({ msg, x:e.clientX, y:e.clientY, segIdx:null })) : undefined}
+                  onMouseMove={!isTotal ? (e => setTooltip(t2 => t2 ? { ...t2, x:e.clientX, y:e.clientY } : null)) : undefined}
+                  onMouseLeave={!isTotal ? (() => setTooltip(null)) : undefined}
                   style={{
                     background: rowActive ? "#1a2030" : "#111827",
                     fontFamily:"'Poppins',sans-serif", fontSize:11, color:"#cbd5e1",
-                    fontWeight:600, padding:"3px 4px", whiteSpace:"nowrap", cursor:"help",
+                    fontWeight:600, padding:"3px 4px", whiteSpace:"nowrap",
+                    cursor: isTotal ? "pointer" : "help",
                     borderLeft: rowActive ? "2px solid #60a5fa" : "2px solid transparent",
                     transition:"all 0.1s"
                   }}
@@ -293,9 +315,9 @@ export default function MessageMap() {
                 {/* ── Segment cells ── */}
                 {SEGMENTS.map((seg, si) => { const colIdx = si + segStartIdx; const val = sop[colIdx], { bg, t: tx } = getSopC(val), isSel = sortCol === colIdx, isHovC = isColActive(colIdx); return (
                   <td key={seg.id}
-                    onMouseEnter={e => { setHoverCol(colIdx); setTooltip({ msg, x:e.clientX, y:e.clientY, segIdx:si }); }}
-                    onMouseMove={e => setTooltip(t2 => t2 ? { ...t2, x:e.clientX, y:e.clientY } : null)}
-                    onMouseLeave={() => { setHoverCol(null); setTooltip(null); }}
+                    onMouseEnter={!isTotal ? (e => { setHoverCol(colIdx); setTooltip({ msg, x:e.clientX, y:e.clientY, segIdx:si }); }) : (() => setHoverCol(colIdx))}
+                    onMouseMove={!isTotal ? (e => setTooltip(t2 => t2 ? { ...t2, x:e.clientX, y:e.clientY } : null)) : undefined}
+                    onMouseLeave={() => { setHoverCol(null); if (!isTotal) setTooltip(null); }}
                     style={{
                       textAlign:"center", borderRadius:2,
                       background: isHovC || isSel ? `${bg}` : bg,
@@ -308,12 +330,27 @@ export default function MessageMap() {
                     }}>{val.toFixed(1)}</td>
                 ); })}
               </tr>
+              {/* ── Expanded message text row (TOTAL mode only) ── */}
+              {isTotal && isExpanded && (
+                <tr>
+                  <td colSpan={3 + 1 + SEGMENTS.length} style={{
+                    background:"#0d1118", padding:"10px 16px", borderLeft:"2px solid #34d399",
+                    borderBottom:"1px solid #1e293b"
+                  }}>
+                    <div style={{ fontSize:11, color:"#94a3b8", lineHeight:1.7, fontFamily:"'Poppins',sans-serif", maxWidth:1200 }}>
+                      <span style={{ fontSize:8, fontWeight:700, color:"#34d399", fontFamily:"'JetBrains Mono',monospace", letterSpacing:1, display:"block", marginBottom:4 }}>CORE MESSAGE</span>
+                      "{msg.control || msg.text}"
+                    </div>
+                  </td>
+                </tr>
+              )}
+              </React.Fragment>
               );
             })}
           </tbody>
         </table>
       </div>
-      {tooltip && <Tooltip msg={tooltip.msg} x={tooltip.x} y={tooltip.y} segIdx={tooltip.segIdx} isVariant={isVariant} />}
+      {!isTotal && tooltip && <Tooltip msg={tooltip.msg} x={tooltip.x} y={tooltip.y} segIdx={tooltip.segIdx} isVariant={isVariant} />}
     </div>
   );
 }
